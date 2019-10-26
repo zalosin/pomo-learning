@@ -4,7 +4,9 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
+
 import Api from '../Api';
+import { withAuthentication } from '../AuthContext';
 
 import './LoginPage.scss';
 
@@ -29,15 +31,15 @@ class LoginPage extends Component {
     }
 
     login() {
-        const { history } = this.props;
+        const { history, authentication } = this.props;
 
         Api.post('login', {
             username: this.state.email,
             password: this.state.password,
         }).then(json => {
             if (json.status) {
-                localStorage.setItem('userInfo', JSON.stringify(json.data));
-                history.replace('/');
+                authentication.login(json.data);
+                history.push('/');
             } else {
                 alert(json.message);
             }
@@ -94,4 +96,4 @@ class LoginPage extends Component {
     }
 }
 
-export default withRouter(LoginPage);
+export default withAuthentication(withRouter(LoginPage));
