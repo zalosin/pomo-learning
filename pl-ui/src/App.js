@@ -6,6 +6,7 @@ import PrivateRoute from './PrivateRoute';
 import LoginPage from './Auth/LoginPage';
 import CoursesPage from './Courses/CoursesPage';
 import ProfilePage from './Profile/ProfilePage';
+import ReadingTime from './ReadingTime/ReadingTime';
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route exact path="/" component={homeRoute} />
         <Route path="/login" component={LoginPage} />
         <PrivateRoute path="/profile" component={ProfilePage} />
+        <Route path="/stats" component={ReadingTime} />
       </div>
     </Router>
   );
