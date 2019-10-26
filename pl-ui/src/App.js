@@ -8,6 +8,7 @@ import CoursesPage from './Courses/CoursesPage';
 import ProfilePage from './Profile/ProfilePage';
 import ReadingTime from './ReadingTime/ReadingTime';
 
+import RTETestPage from './RTETestPage'
 
 function App() {
   const homeRoute = localStorage.getItem('token') ? CoursesPage : LoginPage;
@@ -16,6 +17,7 @@ function App() {
       <div>
         <Route exact path="/" component={homeRoute} />
         <Route path="/login" component={LoginPage} />
+        <Route path="/test" component={RTETestPage} />
         <PrivateRoute path="/profile" component={ProfilePage} />
         <Route path="/stats" component={ReadingTime} />
       </div>
