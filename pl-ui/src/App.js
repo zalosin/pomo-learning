@@ -19,7 +19,7 @@ function App() {
       <Router>
         <Route exact path="/" component={homeRoute} />
         <Route path="/login" component={LoginPage} />
-        <PrivateRoute path="/profile" component={ProfilePage} />
+        <Route path="/profile" component={ProfilePage} />
         <Route path="/stats" component={ReadingTime} />
         <Route path="/toastTest" component={ToastDemo} />
       </Router>
