@@ -6,7 +6,7 @@
     "repository": "https://antal.andrei@modex.tech/developers/JSHacks/jsh2019-blank",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "nodemon index.js"
+        "start": "nodemon index.js --config nodemon.json"
     },
     "author": "",
     "license": "ISC",

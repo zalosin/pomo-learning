@@ -9,9 +9,8 @@ const bodyParser = require("body-parser");
  * DB imports
  */
 const low = require("lowdb");
-const FileSync = require("lowdb/adapters/FileSync");
-const adapter = new FileSync("db.json");
-const db = low(adapter);
+const FileAsync = require("lowdb/adapters/FileAsync");
+const adapter = new FileAsync("db.json");
 /**
  * Server setup
  */
@@ -21,28 +20,33 @@ app.use(
         extended: true
     })
 );
-app.listen(port);
-/**
- * DB setup
- */
-
 /**
  * Actual logic
  */
-app.post("/login", (request, response) => {
-    //TODO search by password as well
-    const test = db
-        .get("posts")
-        .find({ username: request.body.username })
-        .value();
-    if (test) {
-        response.status(200).send({
-            success: true
+low(adapter)
+    .then(db => {
+        app.post("/login", (request, response) => {
+            const test = db
+                .get("users")
+                .find({ username: request.body.username })
+                .value();
+            console.log(
+                `test -> ${JSON.stringify(
+                    test.password
+                )} req password -> ${JSON.stringify(request.body.password)}`
+            );
+            if (test.password === request.body.password) {
+                response.status(200).send({
+                    success: true
+                });
+            } else {
+                response.status(404).send({
+                    error: "Username or password invalid",
+                    success: false
+                });
+            }
         });
-    } else {
-        response.status(404).send({
-            error: "Username or password invalid",
-            success: false
-        });
-    }
-});
+    })
+    .then(() => {
+        app.listen(port, () => console.log(`Running on port ${port}`));
+    });
