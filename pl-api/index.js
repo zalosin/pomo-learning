@@ -5,6 +5,7 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const bodyParser = require("body-parser");
+const cors = require("cors");
 /**
  * DB imports
  */
@@ -15,34 +16,68 @@ const adapter = new FileAsync("db.json");
  * Server setup
  */
 app.use(bodyParser.json());
-app.use(
-    bodyParser.urlencoded({
-        extended: true
-    })
-);
+app.use(cors());
 /**
  * Actual logic
  */
 low(adapter)
     .then(db => {
-        app.post("/login", (request, response) => {
-            const test = db
-                .get("users")
-                .find({ username: request.body.username })
-                .value();
-            console.log(
-                `test -> ${JSON.stringify(
-                    test.password
-                )} req password -> ${JSON.stringify(request.body.password)}`
-            );
-            if (test.password === request.body.password) {
-                response.status(200).send({
-                    success: true
+        app.get("/profile/:username", (req, res) => {
+            try {
+                console.log(
+                    `Received profile request -> ${JSON.stringify(req.params)}`
+                );
+                const user = db
+                    .get("users")
+                    .find({ username: req.params.username })
+                    .value();
+                const userInfo = db
+                    .get("profile")
+                    .find({ id: user.id })
+                    .value();
+                if (userInfo) {
+                    res.json(userInfo);
+                } else {
+                    res.status(404).json({
+                        status: false,
+                        message: false
+                    });
+                }
+            } catch (e) {
+                res.status(500).json({
+                    status: false,
+                    message: "Bad request"
                 });
-            } else {
-                response.status(404).send({
-                    error: "Username or password invalid",
-                    success: false
+            }
+        });
+        app.post("/login", (req, res) => {
+            try {
+                console.log(
+                    `Received login request -> ${JSON.stringify(req.params)}`
+                );
+                const user = db
+                    .get("users")
+                    .find({ username: req.body.username.toLowerCase() })
+                    .value();
+                if (user.password === req.body.password) {
+                    const userInfo = db
+                        .get("profile")
+                        .find({ id: user.id })
+                        .value();
+                    res.status(200).json({
+                        status: true,
+                        data: userInfo
+                    });
+                } else {
+                    res.status(401).json({
+                        status: false,
+                        message: "Invalid username or password"
+                    });
+                }
+            } catch (e) {
+                res.status(500).json({
+                    status: false,
+                    message: "Bad request"
                 });
             }
         });
