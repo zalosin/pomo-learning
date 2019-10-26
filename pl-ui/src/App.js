@@ -1,12 +1,23 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import './App.css';
+import { Route, BrowserRouter as Router } from 'react-router-dom'
+
+import PrivateRoute from './PrivateRoute';
+
+import LoginPage from './Auth/LoginPage';
+import CoursesPage from './Courses/CoursesPage';
+import ProfilePage from './Profile/ProfilePage';
+
 
 function App() {
+  const homeRoute = localStorage.getItem('token') ? CoursesPage : LoginPage;
   return (
-    <Button variant="contained" color="primary">
-      Hello World
-    </Button>
+    <Router>
+      <div>
+        <Route exact path="/" component={homeRoute} />
+        <Route path="/login" component={LoginPage} />
+        <PrivateRoute path="/profile" component={ProfilePage} />
+      </div>
+    </Router>
   );
 }
 
