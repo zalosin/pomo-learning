@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
+
 import Api from '../Api';
+import { withAuthentication } from '../AuthContext';
 
 import './LoginPage.scss';
 
-export default class LoginPage extends Component {
+class LoginPage extends Component {
     constructor(props) {
         super(props);
 
@@ -15,6 +18,8 @@ export default class LoginPage extends Component {
             email: '',
             password: '',
         }
+
+        this.login = this.login.bind(this);
     }
 
     changeEmail = (e) => {
@@ -25,28 +30,33 @@ export default class LoginPage extends Component {
         this.setState({ password: e.target.value });
     }
 
-    login = () => {
+    login() {
+        const { history, authentication } = this.props;
+
         Api.post('login', {
             username: this.state.email,
             password: this.state.password,
         }).then(json => {
             if (json.status) {
-                localStorage.setItem('userInfo', json.data);
+                authentication.login(json.data);
+                history.push('/');
             } else {
-                alert('invalid credentials!');
+                alert(json.message);
             }
         });
     }
 
     render = () => {
+        const { email, password } = this.state;
+
         return (
             <Grid container alignContent="center" direction="column">
                 <Typography component="h1" variant="h5">
                     Log in
-                    </Typography>
+                </Typography>
                 <form noValidate>
                     <TextField
-                        value={this.state.email}
+                        value={email}
                         onChange={this.changeEmail}
                         variant="outlined"
                         margin="normal"
@@ -59,7 +69,7 @@ export default class LoginPage extends Component {
                         autoFocus
                     />
                     <TextField
-                        value={this.state.password}
+                        value={password}
                         onChange={this.changePassword} 
                         variant="outlined"
                         margin="normal"
@@ -72,10 +82,10 @@ export default class LoginPage extends Component {
                         autoComplete="current-password"
                     />
                     <Button
-                        // type="submit"
                         fullWidth
                         variant="contained"
                         color="primary"
+                        disabled={!email || !password}
                         onClick={this.login}
                     >
                         Log In
@@ -85,3 +95,5 @@ export default class LoginPage extends Component {
         );
     }
 }
+
+export default withAuthentication(withRouter(LoginPage));
