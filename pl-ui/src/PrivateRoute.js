@@ -3,13 +3,12 @@ import { Route, Redirect } from 'react-router-dom'
 
 export default ({ component: Component, ...rest }) => {
     const userInfo = localStorage.getItem('userInfo');
-
     const render = (props) => {
         if (!userInfo) {
             return <Redirect to='/login' />;
         }
 
-        props.userInfo = userInfo;
+        props.userInfo = JSON.parse(userInfo);
         return <Component {...props} />;
     }
 

@@ -13,17 +13,17 @@ import ToastDemo from './Toast/Toast';
 import './App.scss';
 
 function App() {
-  const homeRoute = localStorage.getItem('token') ? CoursesPage : LoginPage;
+  const homeRoute = localStorage.getItem('userInfo') ? CoursesPage : LoginPage;
   return (
-    <Container component="main" maxWidth="lg">
-      <Router>
+    <Router>
+      <Container component="main" maxWidth="lg">
         <Route exact path="/" component={homeRoute} />
         <Route path="/login" component={LoginPage} />
         <Route path="/profile" component={ProfilePage} />
         <Route path="/stats" component={ReadingTime} />
         <Route path="/toastTest" component={ToastDemo} />
-      </Router>
-    </Container>
+      </Container>
+    </Router>
   );
 }
 
