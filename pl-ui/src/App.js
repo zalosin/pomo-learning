@@ -7,6 +7,7 @@ import LoginPage from './Auth/LoginPage';
 import CoursesPage from './Courses/CoursesPage';
 import ProfilePage from './Profile/ProfilePage';
 import ReadingTime from './ReadingTime/ReadingTime';
+import ToastDemo from './Toast/Toast';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/login" component={LoginPage} />
         <PrivateRoute path="/profile" component={ProfilePage} />
         <Route path="/stats" component={ReadingTime} />
+        <Route path="/toastTest" component={ToastDemo} />
       </div>
     </Router>
   );

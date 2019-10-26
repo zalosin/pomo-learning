@@ -8,6 +8,8 @@
     "react-dom": "^16.11.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.2.0",
+    "react-toast-notifications": "^2.2.5",
+    "react-toastify": "^5.4.0",
     "reading-time": "^1.2.0"
   },
   "scripts": {
