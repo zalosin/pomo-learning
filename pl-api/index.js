@@ -38,16 +38,13 @@ low(adapter)
                 if (userInfo) {
                     res.json(userInfo);
                 } else {
-                    res.status(404).json({
+                    res.json({
                         status: false,
                         message: false
                     });
                 }
             } catch (e) {
-                res.status(500).json({
-                    status: false,
-                    message: "Bad request"
-                });
+                badRequest(res);
             }
         });
         app.post("/login", (req, res) => {
@@ -64,24 +61,47 @@ low(adapter)
                         .get("profile")
                         .find({ id: user.id })
                         .value();
-                    res.status(200).json({
+                    res.json({
                         status: true,
                         data: userInfo
                     });
                 } else {
-                    res.status(401).json({
+                    res.json({
                         status: false,
                         message: "Invalid username or password"
                     });
                 }
             } catch (e) {
-                res.status(500).json({
-                    status: false,
-                    message: "Bad request"
-                });
+                badRequest(res);
+            }
+        });
+        app.get("/courses/:courseId", (req, res) => {
+            //TODO
+        });
+        app.post("/courses", (req, res) => {
+            //TODO
+            try {
+                const course = req.body;
+                if (course.title && course.chunks.length > 0) {
+                    db.get("courses")
+                        .push(req.body)
+                        .last()
+                        .assign({ id: Date.now().toString() })
+                        .write()
+                        .then(course => res.send(course));
+                }
+            } catch (e) {
+                badRequest(res);
             }
         });
     })
     .then(() => {
         app.listen(port, () => console.log(`Running on port ${port}`));
     });
+
+function badRequest(res) {
+    return res.json({
+        status: false,
+        message: "Bad request"
+    });
+}
