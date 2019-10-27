@@ -42,17 +42,19 @@ class EditableCourseChunk extends Component {
 
     renderEditorDataHTML = () => {
         const {contentState} = this.state;
-        const {index, setEditMode} = this.props;
+        const {index, setEditMode, isStudent} = this.props;
         return (
             <div style={{position: 'relative', border: "1px solid #ccc", width:"800px", padding: "20px 10px", borderRadius:"6px"}}>
                 <div dangerouslySetInnerHTML={{__html: stateToHTML(contentState)}} />
-                <IconButton
-                    size="small"
-                    onClick={()=>setEditMode(index, true)}
-                    style={{position: 'absolute', right: 0, top: 0}}
-                >
-                    <EditIcon />
-                </IconButton>
+                {!isStudent && (
+                    <IconButton
+                        size="small"
+                        onClick={()=>setEditMode(index, true)}
+                        style={{position: 'absolute', right: 0, top: 0}}
+                    >
+                        <EditIcon />
+                    </IconButton>
+                )}
                 <div>
                     {}
                 </div>

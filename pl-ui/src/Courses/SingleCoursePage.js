@@ -5,13 +5,45 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import AddIcon from '@material-ui/icons/Add';
 import {convertFromRaw, convertToRaw} from "draft-js";
+import {withAuthentication} from "../AuthContext";
+import Modal from '@material-ui/core/Modal';
+import Backdrop from "@material-ui/core/Backdrop/Backdrop";
+import {animated, useSpring} from "react-spring";
+
+
+const Fade = React.forwardRef(function Fade(props, ref) {
+    const { in: open, children, onEnter, onExited, ...other } = props;
+    const style = useSpring({
+        from: { opacity: 0 },
+        to: { opacity: open ? 1 : 0 },
+        onStart: () => {
+            if (open && onEnter) {
+                onEnter();
+            }
+        },
+        onRest: () => {
+            if (!open && onExited) {
+                onExited();
+            }
+        },
+    });
+
+    return (
+        <animated.div ref={ref} style={style} {...other}>
+            {children}
+        </animated.div>
+    );
+});
 
 class SingleCoursePage extends Component {
     constructor(props) {
         super(props);
         this.state = {
             course: {title:'', chunks: []},
-            editModeArray: []
+            editModeArray: [],
+            chunkIndex: 0,
+            chunksToShow: 2,
+            open: false
         }
     }
 
@@ -51,6 +83,12 @@ class SingleCoursePage extends Component {
         })
     };
 
+    setModalOpen = (open)=>{
+        this.setState({
+            open
+        })
+    };
+
     addChunk = ()=>{
         const {course, editModeArray} = this.state;
         course.chunks.push('');
@@ -69,7 +107,9 @@ class SingleCoursePage extends Component {
     };
 
     render() {
-        const {course, editModeArray} = this.state;
+        const {course, editModeArray, open} = this.state;
+        const {authentication: {userInfo}} = this.props;
+
         return (
             <div>
                 <Typography variant="h4" style={{marginTop: "20px"}}>
@@ -86,19 +126,23 @@ class SingleCoursePage extends Component {
                         setChunk={this.setChunk}
                         index={key}
                         key={key}
-                        editMode={editModeArray[key]}
+                        editMode={userInfo.isStudent ? false : editModeArray[key]}
+                        isStudent={userInfo.isStudent}
                         setEditMode={this.setEditMode}
                     />
                 }
                 )}
-                <Button
-                    variant="contained"
-                    onClick={this.addChunk}
-                    style={{marginTop:"20px"}}
-                >
-                    <AddIcon />
-                </Button>
-                {!!course.chunks.length &&
+                {!userInfo.isStudent && (
+                    <Button
+                        variant="contained"
+                        onClick={this.addChunk}
+                        style={{marginTop:"20px"}}
+                    >
+                        <AddIcon />
+                    </Button>
+                )}
+                {!userInfo.isStudent &&
+                    !!course.chunks.length &&
                     !(course.chunks.length===1 && course.chunks[0] === '') &&
                     editModeArray.every(editMode=>!editMode) &&
                 (
@@ -111,9 +155,26 @@ class SingleCoursePage extends Component {
                         SAVE
                     </Button>
                 )}
+                {userInfo.isStudent && (
+                    <Modal
+                        aria-labelledby="spring-modal-title"
+                        aria-describedby="spring-modal-description"
+                        open={open}
+                        onClose={()=>this.setModalOpen(false)}
+                        closeAfterTransition
+                        BackdropComponent={Backdrop}
+                        BackdropProps={{
+                            timeout: 500,
+                        }}
+                    >
+                        <Fade in={open}>
+
+                        </Fade>
+                    </Modal>
+                )}
             </div>
         );
     }
 }
 
-export default SingleCoursePage;
+export default withAuthentication(SingleCoursePage);

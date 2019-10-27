@@ -7,8 +7,9 @@ import AddIcon from '@material-ui/icons/Add';
 import { Link as RouterLink } from 'react-router-dom';
 
 import Api from '../Api';
+import {withAuthentication} from "../AuthContext";
 
-export default class CoursesPage extends Component {
+class CoursesPage extends Component {
     constructor(props) {
         super(props);
 
@@ -26,6 +27,7 @@ export default class CoursesPage extends Component {
 
     render() {
         const { courses } = this.state;
+        const { authentication: {userInfo} } = this.props;
         const fabStyle= { position: 'fixed', bottom: '50px', right: '50px' };
 
         return (
@@ -42,13 +44,17 @@ export default class CoursesPage extends Component {
                         </RouterLink>
                     ))}
 
-                    <RouterLink to={`/createCourse/${courses.length}`}>
-                        <Fab color="primary" style={fabStyle} >
-                            <AddIcon />
-                        </Fab>
-                    </RouterLink>
+                    {!userInfo.isStudent && (
+                        <RouterLink to={`/createCourse/${courses.length}`}>
+                            <Fab color="primary" style={fabStyle} >
+                                <AddIcon />
+                            </Fab>
+                        </RouterLink>
+                    )}
                 </List>
             </Fragment>
         );
     }
 }
+
+export default withAuthentication(CoursesPage);
