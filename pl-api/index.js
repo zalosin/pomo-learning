@@ -42,6 +42,7 @@ low(adapter)
                     .find({ id: user.id })
                     .value();
                 if (userInfo) {
+                    console.log(userInfo);
                     res.json(userInfo);
                 } else {
                     res.json({
@@ -144,7 +145,15 @@ low(adapter)
                     )}`
                 );
                 const savedCourses = db.get("courses").value();
-                res.send(savedCourses);
+                if (savedCourses){
+                    savedCourses.forEach(course => {
+                        const test = db.get("coursesInfo")
+                        .find({id : course.id})
+                        .value()
+                        course.readTime = getReadTime(test);
+                    })
+                    res.send(savedCourses);
+                }
             } catch (e) {
                 console.error(e);
                 badRequest(res);
