@@ -121,9 +121,9 @@ low(adapter)
                     .get("coursesInfo")
                     .find({ id: req.params.courseId.toString() })
                     .value();
-                course.readTime = getReadTime(course);
                 console.log(course);
                 if (course) {
+                    course.readTime = getReadTime(course);
                     res.json(course);
                 } else {
                     res.json({
