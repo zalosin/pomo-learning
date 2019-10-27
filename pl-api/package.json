@@ -16,6 +16,7 @@
         "express": "^4.17.1",
         "lowdb": "^1.0.0",
         "nodemon": "^1.19.4",
-        "prettier": "^1.18.2"
+        "prettier": "^1.18.2",
+        "reading-time": "^1.2.0"
     }
 }
