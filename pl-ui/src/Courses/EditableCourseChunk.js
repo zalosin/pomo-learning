@@ -13,7 +13,8 @@ class EditableCourseChunk extends Component {
         super(props);
         const emptyEditorState = EditorState.createEmpty();
         this.state = {
-            contentState: props.chunk ? convertFromRaw(props.chunk) : emptyEditorState.getCurrentContent()
+            contentState: props.chunk ? props.chunk : emptyEditorState.getCurrentContent(),
+            stats: {}
         }
     }
 
@@ -29,6 +30,14 @@ class EditableCourseChunk extends Component {
             defaultDataLoaded: false
         });
         setChunk(index, contentState);
+    };
+
+    estimateTime = (editorState) => {
+        const {} = this.props;
+        const htmlCourse = stateToHTML(editorState.getCurrentContent());
+        this.setState({
+            stats: readingTime(htmlCourse, {wordsPerMinute: 75})
+        });
     };
 
     renderEditorDataHTML = () => {
@@ -52,25 +61,46 @@ class EditableCourseChunk extends Component {
     };
 
     render() {
-        const {contentState, defaultDataLoaded} = this.state;
+        const {contentState, defaultDataLoaded, stats} = this.state;
         const {editMode} = this.props;
         const rawDraftContentState = JSON.stringify(convertToRaw(contentState));
+        const {minutes} = stats;
+        const controls = ["title", "bold", "italic", "underline", "strikethrough", "highlight", "undo", "redo", "link", "media", "numberList", "bulletList", "quote", "code", "clear"];
 
+        if (minutes <= 2) {
+            controls.push("save");
+        }
         return (
             <div>
                 {editMode ? (
-                    <MUIRichTextEditor
-                        label="Start typing..."
-                        value={(!defaultDataLoaded) ? rawDraftContentState : undefined}
-                        onSave={data=>{
-                            const jsonData = JSON.parse(data);
-                            if(jsonData.blocks.length === 1 && jsonData.blocks[0].text==='') {
-                                this.onSave(false)
-                            } else {
-                                this.onSave(convertFromRaw(jsonData));
-                            }
-                        }}
-                    />
+                    <div>
+                        <MUIRichTextEditor
+                            label="Start typing..."
+                            value={(!defaultDataLoaded) ? rawDraftContentState : undefined}
+                            controls={controls}
+                            onChange={this.estimateTime}
+                            onSave={data=>{
+                                const jsonData = JSON.parse(data);
+                                if(jsonData.blocks.length === 1 && jsonData.blocks[0].text==='') {
+                                    this.onSave(false)
+                                } else {
+                                    this.onSave(convertFromRaw(jsonData));
+                                }
+                            }}
+                        />
+                        {!!stats.text && (
+                            <div style={{
+                                color: minutes <= 2 ? "green" : "red"
+                            }}>
+                                {stats.text}
+                                {minutes > 2 && (
+                                    <p>
+                                        This chunk is too big! Move some of the info into a new chunk.
+                                    </p>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 ) : this.renderEditorDataHTML()}
             </div>
         );

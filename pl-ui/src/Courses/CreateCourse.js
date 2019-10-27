@@ -8,14 +8,16 @@ class CreateCourse extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            title: ''
+            title: '',
+            description: '',
         }
     }
     createNewCourse = ()=>{
         const {history} = this.props;
-        const {title} = this.state;
+        const {title, description} = this.state;
         Api.post('courses', {
             title,
+            description,
             chunks: []
         }).then(({courseId})=>{
             history.push(`/course/${courseId}`);
@@ -26,8 +28,11 @@ class CreateCourse extends Component {
     changeTitle = (e) => {
         this.setState({ title: e.target.value });
     };
+    changeDescription = (e) => {
+        this.setState({ description: e.target.value });
+    };
     render() {
-        const {title} = this.state;
+        const {title, description} = this.state;
         return (
             <div>
                 <form noValidate>
@@ -42,6 +47,16 @@ class CreateCourse extends Component {
                         label="Course Title"
                         name="courseTitle"
                         autoFocus
+                    />
+                    <TextField
+                        value={description}
+                        onChange={this.changeDescription}
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        id="courseDescription"
+                        label="Course Description"
+                        name="courseDescription"
                     />
                     {title && (
                         <Button

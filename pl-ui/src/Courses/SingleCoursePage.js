@@ -4,7 +4,7 @@ import Api from '../Api';
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import AddIcon from '@material-ui/icons/Add';
-import {convertToRaw} from "draft-js";
+import {convertFromRaw, convertToRaw} from "draft-js";
 
 class SingleCoursePage extends Component {
     constructor(props) {
@@ -21,6 +21,8 @@ class SingleCoursePage extends Component {
             if(!resp) {
                 history.push('/courses');
             } else {
+                const {chunks} = resp;
+                resp.chunks = chunks.map(chunk => convertFromRaw(chunk));
                 this.setState({course: resp, editModeArray: resp.chunks.map(()=>false) })
             }
         })
@@ -70,9 +72,14 @@ class SingleCoursePage extends Component {
         const {course, editModeArray} = this.state;
         return (
             <div>
-                <Typography variant="h4">
+                <Typography variant="h4" style={{marginTop: "20px"}}>
                     {course.title}
                 </Typography>
+                {course.description && (
+                    <Typography variant="h5" style={{marginTop: "10px", marginBottom: "10px"}}>
+                        {course.description}
+                    </Typography>
+                )}
                 {course.chunks.map((chunk, key)=> {
                     return <EditableCourseChunk
                         chunk={chunk}
