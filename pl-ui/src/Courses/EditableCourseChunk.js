@@ -6,21 +6,25 @@ import EditIcon from '@material-ui/icons/Edit';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Api from '../Api';
+import readingTime from 'reading-time';
 
 class EditableCourseChunk extends Component {
     constructor(props) {
         super(props);
         const emptyEditorState = EditorState.createEmpty();
         this.state = {
-            editMode: false,
             contentState: props.chunk ? convertFromRaw(props.chunk) : emptyEditorState.getCurrentContent()
         }
     }
 
     onSave = (contentState) => {
-        const {setChunk, index} = this.props;
+        const {setChunk, index, setEditMode} = this.props;
+        setEditMode(index, false);
+        if(contentState === false) {
+            setChunk(index, contentState);
+            return;
+        }
         this.setState({
-            editMode: false,
             contentState,
             defaultDataLoaded: false
         });
@@ -29,22 +33,27 @@ class EditableCourseChunk extends Component {
 
     renderEditorDataHTML = () => {
         const {contentState} = this.state;
+        const {index, setEditMode} = this.props;
         return (
             <div style={{position: 'relative', border: "1px solid #ccc", width:"800px", padding: "20px 10px", borderRadius:"6px"}}>
                 <div dangerouslySetInnerHTML={{__html: stateToHTML(contentState)}} />
                 <IconButton
                     size="small"
-                    onClick={()=>this.setState({editMode: true})}
+                    onClick={()=>setEditMode(index, true)}
                     style={{position: 'absolute', right: 0, top: 0}}
                 >
                     <EditIcon />
                 </IconButton>
+                <div>
+                    {}
+                </div>
             </div>
         )
     };
 
     render() {
-        const {editMode, contentState, defaultDataLoaded} = this.state;
+        const {contentState, defaultDataLoaded} = this.state;
+        const {editMode} = this.props;
         const rawDraftContentState = JSON.stringify(convertToRaw(contentState));
 
         return (
@@ -53,7 +62,14 @@ class EditableCourseChunk extends Component {
                     <MUIRichTextEditor
                         label="Start typing..."
                         value={(!defaultDataLoaded) ? rawDraftContentState : undefined}
-                        onSave={data=>this.onSave(convertFromRaw(JSON.parse(data)))}
+                        onSave={data=>{
+                            const jsonData = JSON.parse(data);
+                            if(jsonData.blocks.length === 1 && jsonData.blocks[0].text==='') {
+                                this.onSave(false)
+                            } else {
+                                this.onSave(convertFromRaw(jsonData));
+                            }
+                        }}
                     />
                 ) : this.renderEditorDataHTML()}
             </div>

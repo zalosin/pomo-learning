@@ -10,7 +10,8 @@ class SingleCoursePage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            course: {title:'', chunks: []}
+            course: {title:'', chunks: []},
+            editModeArray: []
         }
     }
 
@@ -20,24 +21,39 @@ class SingleCoursePage extends Component {
             if(!resp) {
                 history.push('/courses');
             } else {
-                this.setState({course: resp})
+                this.setState({course: resp, editModeArray: resp.chunks.map(()=>false) })
             }
         })
     }
 
     setChunk = (i, chunk)=>{
-        const {course} = this.state;
+        const {course, editModeArray} = this.state;
         const {chunks} = course;
-        chunks[i] = chunk;
+        if(chunk === false) {
+            chunks.splice(i, 1);
+            editModeArray.splice(i, 1);
+        } else {
+            chunks[i] = chunk;
+        }
         this.setState({
-            course: {...course, chunks}
+            course: {...course, chunks},
+            editModeArray
+        })
+    };
+
+    setEditMode = (i, mode)=>{
+        const {editModeArray} = this.state;
+        editModeArray[i] = mode;
+        this.setState({
+            editModeArray
         })
     };
 
     addChunk = ()=>{
-        const {course} = this.state;
+        const {course, editModeArray} = this.state;
         course.chunks.push('');
-        this.setState({course});
+        editModeArray.push(true);
+        this.setState({course, editModeArray});
     };
 
     putChanges = ()=>{
@@ -45,20 +61,27 @@ class SingleCoursePage extends Component {
         const {course} = this.state;
         Api.put(`courses/${code}`, {
             ...course,
-            chunks: course.chunks.map(chunk=>convertToRaw(chunk))
+            chunks: course.chunks
+                .map(chunk => convertToRaw(chunk))
         });
     };
 
     render() {
-        const {course} = this.state;
+        const {course, editModeArray} = this.state;
         return (
             <div>
                 <Typography variant="h4">
                     {course.title}
                 </Typography>
                 {course.chunks.map((chunk, key)=> {
-                    console.log(chunk);
-                    return <EditableCourseChunk setChunk={this.setChunk} index={key} key={key}/>
+                    return <EditableCourseChunk
+                        chunk={chunk}
+                        setChunk={this.setChunk}
+                        index={key}
+                        key={key}
+                        editMode={editModeArray[key]}
+                        setEditMode={this.setEditMode}
+                    />
                 }
                 )}
                 <Button
@@ -68,7 +91,10 @@ class SingleCoursePage extends Component {
                 >
                     <AddIcon />
                 </Button>
-                {!!course.chunks.length && (
+                {!!course.chunks.length &&
+                    !(course.chunks.length===1 && course.chunks[0] === '') &&
+                    editModeArray.every(editMode=>!editMode) &&
+                (
                     <Button
                         variant="contained"
                         color="primary"
