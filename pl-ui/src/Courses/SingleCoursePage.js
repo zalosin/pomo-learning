@@ -163,7 +163,7 @@ class SingleCoursePage extends Component {
                 {course.chunks.map((chunk, key)=> {
                     return <EditableCourseChunk
                         chunk={chunk}
-                        greyedOut={userInfo.isStudent && (key < chunkIndex || key >= chunkIndex+chunksToShow)}
+                        greyedOut={userInfo.isStudent && key >= chunkIndex+chunksToShow}
                         setChunk={this.setChunk}
                         index={key}
                         key={key}
@@ -206,6 +206,9 @@ class SingleCoursePage extends Component {
                         BackdropComponent={Backdrop}
                         BackdropProps={{
                             timeout: 500,
+                            style: {
+                                pointerEvents: "none"
+                            }
                         }}
                         style={{
                             display: 'flex',
@@ -221,7 +224,8 @@ class SingleCoursePage extends Component {
                                 backgroundColor: "#fff",
                                 display: "flex",
                                 flexDirection: "column",
-                                alignItems: "center"
+                                alignItems: "center",
+                                userSelect: "none"
                             }}>
                                 <h3>{modalText}</h3>
                                 {modalButtonText && (
