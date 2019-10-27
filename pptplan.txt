@@ -1,0 +1,59 @@
+V1. Slideshows
+
+- problem solved
+- pomodoro technique - statistics
+
+- our idea
+    - basic flows
+    - profs: input course in chunks
+    - student: quiz for setting work / break int
+
+- personalized pomodoro technique
+
+- future ideas
+    - profs
+        - easier methods to input courses
+        - testing
+        - reporting
+    - students
+        - efficient time management
+        - input prof's courses
+            - stressful deadlines / events that disturb their workflow
+        - data mining
+            - work int / break int calibration
+            - incentives
+
+- methods of marketing the app - for both
+
+
+V0. Slideshows
+
+- problem solved
+
+- pomodoro technique
+    - history
+    - statistics
+
+- our idea
+    - basic flows
+    - profs: input course in chunks
+    - student: quiz for setting work / break int
+
+- future ideas
+    - profs
+        - easier methods to input courses
+        - reporting
+        - testing
+    - students
+        - efficient time management
+        - input prof's courses
+            - stressful deadlines / events that disturb their workflow
+        - data mining
+            - work int / break int calibration
+            - incentives
+
+- methods of marketing the app
+    - for students
+    - for profs
+    - for both
+
