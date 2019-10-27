@@ -7,8 +7,9 @@ import AddIcon from '@material-ui/icons/Add';
 import { Link as RouterLink } from 'react-router-dom';
 
 import Api from '../Api';
+import {withAuthentication} from "../AuthContext";
 
-export default class CoursesPage extends Component {
+class CoursesPage extends Component {
     constructor(props) {
         super(props);
 
@@ -20,19 +21,20 @@ export default class CoursesPage extends Component {
     componentDidMount = () => {
         Api.get('courses')
             .then(json => {
-                this.setState({ courses: json });
+                this.setState({ courses: json || [] });
             });
     }
 
     render() {
         const { courses } = this.state;
+        const { authentication: {userInfo} } = this.props;
         const fabStyle= { position: 'fixed', bottom: '50px', right: '50px' };
 
         return (
             <Fragment>
                 <List>
                     {courses.map(course => (
-                        <RouterLink to={`/courses/${course.id}`}>
+                        <RouterLink to={`/course/${course.id}`}>
                             <ListItem divider>
                                 <ListItemText
                                     primary={course.title}
@@ -41,14 +43,18 @@ export default class CoursesPage extends Component {
                             </ListItem>
                         </RouterLink>
                     ))}
-                    
-                    <RouterLink to="/createCourse">
-                        <Fab color="primary" style={fabStyle} >
-                            <AddIcon />
-                        </Fab>
-                    </RouterLink>
+
+                    {!userInfo.isStudent && (
+                        <RouterLink to={`/createCourse/${courses.length}`}>
+                            <Fab color="primary" style={fabStyle} >
+                                <AddIcon />
+                            </Fab>
+                        </RouterLink>
+                    )}
                 </List>
             </Fragment>
         );
     }
 }
+
+export default withAuthentication(CoursesPage);

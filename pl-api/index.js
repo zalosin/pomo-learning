@@ -13,6 +13,10 @@ const low = require("lowdb");
 const FileAsync = require("lowdb/adapters/FileAsync");
 const adapter = new FileAsync("db.json");
 /**
+ * Courses imports
+ */
+const readingTime = require("reading-time");
+/**
  * Server setup
  */
 app.use(bodyParser.json());
@@ -49,10 +53,39 @@ low(adapter)
                 badRequest(res);
             }
         });
+        app.put("/profile/:id", (req, res) => {
+            try {
+                console.log(
+                    `Received profile/username PUT request -> ${JSON.stringify(
+                        req.params.id
+                    )}`
+                );
+                console.log(`Received timeSettings -> ${JSON.stringify(req.body)}`)
+                const user =                 db
+                .get("profile")
+                .find({ id: parseInt(req.params.id) }).value()
+                console.log(`FOund this user -> ${JSON.stringify(user)}`);
+                db
+                    .get("profile")
+                    .find({ id: parseInt(req.params.id) })
+                    .assign({
+                        "learnTime": req.body.timeSettings.learnTime,
+                        "breakTime": req.body.timeSettings.breakTime
+                    })
+                    .write()
+                    .then((updated) => {
+                        console.log(JSON.stringify(updated));
+                        res.status(200).json(updated)
+                    })
+            } catch (e) {
+                console.error(e)
+                badRequest(res);
+            }
+        });
         app.post("/login", (req, res) => {
             try {
                 console.log(
-                    `Received login request -> ${JSON.stringify(req.params)}`
+                    `Received login request -> ${JSON.stringify(req.body)}`
                 );
                 const user = db
                     .get("users")
@@ -88,6 +121,7 @@ low(adapter)
                     .get("coursesInfo")
                     .find({ id: req.params.courseId.toString() })
                     .value();
+                course.readTime = getReadTime(course);
                 console.log(course);
                 if (course) {
                     res.json(course);
@@ -133,12 +167,16 @@ low(adapter)
                         db.get("coursesInfo")
                             .push(course)
                             .last()
-                            .assign({ id: getId(savedCourse) })
+                            .assign({
+                                id: getId(savedCourse),
+                                readingTime: getReadTime(req.body)
+                            })
                             .write()
                             .then(() => {
                                 const shortInfo = {
                                     id: getId(savedCourse),
-                                    title: course.title
+                                    title: course.title,
+                                    description: course.description
                                 };
                                 db.get("courses")
                                     .push(shortInfo)
@@ -147,6 +185,7 @@ low(adapter)
                                     .then(postedCourse =>
                                         res.send({
                                             status: true,
+                                            courseId: postedCourse.id,
                                             message: `Successfully added course with id ${postedCourse.id}`
                                         })
                                     );
@@ -160,7 +199,8 @@ low(adapter)
                             .then(() => {
                                 const shortInfo = {
                                     id: "0",
-                                    title: course.title
+                                    title: course.title,
+                                    description: course.description
                                 };
                                 db.get("courses")
                                     .push(shortInfo)
@@ -169,6 +209,7 @@ low(adapter)
                                     .then(postedCourse =>
                                         res.send({
                                             status: true,
+                                            courseId: postedCourse.id,
                                             message: `Successfully added course with id ${postedCourse.id}`
                                         })
                                     );
@@ -196,14 +237,16 @@ low(adapter)
                         .assign({
                             title: req.body.title,
                             courseIndex: req.body.courseIndex,
-                            chunks: req.body.chunks
+                            chunks: req.body.chunks,
+                            description: req.body.description
                         })
                         .write()
                         .then(thisID => {
                             db.get("courses")
                                 .find({ id: req.params.courseId.toString() })
                                 .assign({
-                                    title: req.body.title
+                                    title: req.body.title,
+                                    description: req.body.description
                                 })
                                 .write()
                                 .then(postedCourse =>
@@ -271,6 +314,9 @@ low(adapter)
         app.listen(port, () => console.log(`Running on port ${port}`));
     });
 
+/**
+ * Helpers
+ */
 function badRequest(res) {
     return res.json({
         status: false,
@@ -282,4 +328,18 @@ function getId(course) {
     const str = parseInt(course.id) + 1;
     console.log(course.id);
     return str.toString();
+}
+
+function getReadTime(course) {
+    try {
+        let mainText = "";
+        if (course.chunks.length > 0) {
+            course.chunks.forEach(chunk => {
+                mainText += chunk.blocks[0].text + " ";
+            });
+            return readingTime(mainText);
+        }
+    } catch (e) {
+        console.error(e);
+    }
 }

@@ -10,6 +10,8 @@ import Box from '@material-ui/core/Box';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { Link as RouterLink } from 'react-router-dom';
 
+import SpringModal from './Modal/Modal';
+
 import './AppHeader.scss';
 
 export default ({ userInfo }) => {
@@ -34,6 +36,8 @@ export default ({ userInfo }) => {
                         </Typography>
                     </RouterLink>
                     <Box ml="auto">
+                        <SpringModal />
+                        
                         {
                             !userInfo && 
                             <RouterLink to="/login">
@@ -52,6 +56,7 @@ export default ({ userInfo }) => {
                             </IconButton>
                         }
                     </Box>
+                    
                 </Toolbar>
             </AppBar>
             <Menu

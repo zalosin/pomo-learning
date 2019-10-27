@@ -3,6 +3,7 @@ import { Container } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import './ProfilePage.scss'
+import SpringModal from '../Modal/Modal';
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -26,8 +27,8 @@ function ProfilePage() {
     const classes = useStyles();
 
     const [values, setValues] = React.useState({
-        name: 'Ching Chong',
-        college: 'Scoala Vietii',
+        name: 'Catatuts Geo',
+        college: 'Scoala',
         description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
         
         
