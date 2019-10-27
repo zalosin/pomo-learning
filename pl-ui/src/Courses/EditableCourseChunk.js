@@ -4,6 +4,8 @@ import {EditorState, convertFromRaw, convertToRaw, ContentState} from "draft-js"
 import MUIRichTextEditor from "mui-rte";
 import EditIcon from '@material-ui/icons/Edit';
 import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Api from '../Api';
 
 class EditableCourseChunk extends Component {
     constructor(props) {
@@ -11,30 +13,32 @@ class EditableCourseChunk extends Component {
         const emptyEditorState = EditorState.createEmpty();
         this.state = {
             editMode: false,
-            contentState: props.contentState || emptyEditorState.getCurrentContent()
+            contentState: props.chunk ? convertFromRaw(props.chunk) : emptyEditorState.getCurrentContent()
         }
     }
 
     onSave = (contentState) => {
+        const {setChunk, index} = this.props;
         this.setState({
             editMode: false,
             contentState,
             defaultDataLoaded: false
-        })
+        });
+        setChunk(index, contentState);
     };
 
     renderEditorDataHTML = () => {
         const {contentState} = this.state;
         return (
-            <div>
-                <Button
-                    variant="contained"
-                    color="primary"
+            <div style={{position: 'relative', border: "1px solid #ccc", width:"800px", padding: "20px 10px", borderRadius:"6px"}}>
+                <div dangerouslySetInnerHTML={{__html: stateToHTML(contentState)}} />
+                <IconButton
+                    size="small"
                     onClick={()=>this.setState({editMode: true})}
+                    style={{position: 'absolute', right: 0, top: 0}}
                 >
                     <EditIcon />
-                </Button>
-                <div dangerouslySetInnerHTML={{__html: stateToHTML(contentState)}} />
+                </IconButton>
             </div>
         )
     };

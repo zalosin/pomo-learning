@@ -20,7 +20,7 @@ export default class CoursesPage extends Component {
     componentDidMount = () => {
         Api.get('courses')
             .then(json => {
-                this.setState({ courses: json });
+                this.setState({ courses: json || [] });
             });
     }
 
@@ -32,7 +32,7 @@ export default class CoursesPage extends Component {
             <Fragment>
                 <List>
                     {courses.map(course => (
-                        <RouterLink to={`/courses/${course.id}`}>
+                        <RouterLink to={`/course/${course.id}`}>
                             <ListItem divider>
                                 <ListItemText
                                     primary={course.title}
@@ -41,8 +41,8 @@ export default class CoursesPage extends Component {
                             </ListItem>
                         </RouterLink>
                     ))}
-                    
-                    <RouterLink to="/createCourse">
+
+                    <RouterLink to={`/createCourse/${courses.length}`}>
                         <Fab color="primary" style={fabStyle} >
                             <AddIcon />
                         </Fab>
