@@ -35,8 +35,10 @@ export default ({ userInfo }) => {
                             Pomo Learning
                         </Typography>
                     </RouterLink>
-                    <Box ml="auto">
-                        <SpringModal />
+                    <Box ml="auto" display="flex">
+                        <Box mr="20px">
+                            <SpringModal />
+                        </Box>
                         
                         {
                             !userInfo && 

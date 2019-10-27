@@ -4,8 +4,10 @@ import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import { useSpring, animated } from 'react-spring';
 import './Modal.scss';
-import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import Api from '../Api';
+import { Button, Input } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   modal: {
@@ -82,18 +84,20 @@ export default function SpringModal() {
     }
     console.log(`Sending -> ${JSON.stringify(body)}`);
     Api.put(`profile/${userInfo}`,body).then(json => {
-        if (json.status) {
-        } else {
-            // alert(jsxon.message);
-        }
+      setOpen(false);
+
     });
   }
 
   return (
     <div>
-      <Button variant="contained" className={classes.button} onClick={handleOpen}>
-        Time settings
-      </Button>
+      <IconButton
+          edge="end"
+          onClick={handleOpen}
+          style={{ color: 'white' }}
+      >
+          <HourglassEmptyIcon />
+      </IconButton>
       <Modal
         aria-labelledby="spring-modal-title"
         aria-describedby="spring-modal-description"
@@ -109,13 +113,19 @@ export default function SpringModal() {
         <Fade in={open}>
           <div className={classes.paper}>
             <h2 id="spring-modal-title">Build your tempo</h2><hr/>
-            <p id="spring-modal-description">Allocate your time to learn but also to rest</p>
+            <p id="spring-modal-description">Allocate your time to learn, but also to rest:</p>
             <form>
-            <label>Time of learning</label>
-            <input type='number' name='learn' onChange={changeLearn} placeholder='>20' min="20"></input><br/><br/>
-            <label>Resting time</label>
-            <input type='number' name='rest' onChange={changeRest} placeholder='>0' min='0' max="20"></input><br/><br />
-            <input type="submit" onClick={sendValues}  value="Submit"></input><br/>
+              <label>Time of learning</label>
+              <br/>
+              <Input type='number' name='learn' onChange={changeLearn} placeholder='> 20' min="20"></Input>
+              <br/>
+              <br/>
+              <label>Resting time</label>
+              <br/>
+              <Input type='number' name='rest' onChange={changeRest} placeholder='> 0' min='0' max="20"></Input>
+              <br/>
+              <Button onClick={sendValues} variant="contained" color="primary" style={{ display: 'flex', marginLeft: 'auto' }}>Submit</Button>
+              <br/>
             </form>
           </div>
         </Fade>
