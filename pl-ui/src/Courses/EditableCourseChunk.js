@@ -42,10 +42,27 @@ class EditableCourseChunk extends Component {
 
     renderEditorDataHTML = () => {
         const {contentState} = this.state;
-        const {index, setEditMode, isStudent} = this.props;
+        const {index, setEditMode, isStudent, greyedOut} = this.props;
         return (
-            <div style={{position: 'relative', border: "1px solid #ccc", width:"800px", padding: "20px 10px", borderRadius:"6px"}}>
-                <div dangerouslySetInnerHTML={{__html: stateToHTML(contentState)}} />
+            <div
+                style={{
+                    position: 'relative',
+                    border: "1px solid #ccc",
+                    width:"800px",
+                    padding: "20px 10px",
+                    borderRadius:"6px",
+                    backgroundSize: '54.69px 58.65px',
+                    backgroundImage: greyedOut ? `
+                        linear-gradient(133deg, #8f8f8f 25%, #a6a6a6 25%, #a6a6a6 50%, #8f8f8f 50%, #8f8f8f 75%, #a6a6a6 75%, #a6a6a6 100%)
+                    ` : 'none',
+                }}
+            >
+                <div
+                    dangerouslySetInnerHTML={{__html: stateToHTML(contentState)}}
+                    style={{
+                        opacity: greyedOut ? "0" : "1"
+                    }}
+                />
                 {!isStudent && (
                     <IconButton
                         size="small"
