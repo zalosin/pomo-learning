@@ -212,13 +212,15 @@ class SingleCoursePage extends Component {
                                 alignItems: "center"
                             }}>
                                 <h3>{modalText}</h3>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={modalAction}
-                                >
-                                    {modalButtonText}
-                                </Button>
+                                {modalButtonText && (
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={modalAction}
+                                    >
+                                        {modalButtonText}
+                                    </Button>
+                                )}
                             </div>
                         </Fade>
                     </Modal>
@@ -230,7 +232,13 @@ class SingleCoursePage extends Component {
                         checkpoints={[
                             {
                                 time: 0,
-                                callback: () => this.stop(),
+                                callback: () => {
+                                    this.stop();
+                                    this.setState({
+                                        modalButtonText: '',
+                                        modalText: 'Enjoy your break!'
+                                    })
+                                },
                             }
                         ]}
                     >
