@@ -3,7 +3,7 @@
  */
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = 3001;
 const bodyParser = require("body-parser");
 const cors = require("cors");
 /**
@@ -147,6 +147,7 @@ low(adapter)
                                     .then(postedCourse =>
                                         res.send({
                                             status: true,
+                                            courseId: postedCourse.id,
                                             message: `Successfully added course with id ${postedCourse.id}`
                                         })
                                     );
@@ -169,6 +170,7 @@ low(adapter)
                                     .then(postedCourse =>
                                         res.send({
                                             status: true,
+                                            courseId: postedCourse.id,
                                             message: `Successfully added course with id ${postedCourse.id}`
                                         })
                                     );
