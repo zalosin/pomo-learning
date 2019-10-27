@@ -128,15 +128,26 @@ class SingleCoursePage extends Component {
         this.setState(newState);
     };
 
-    stop = () => {
-        this.setState({
-            open: true,
-            working: false
-        });
+    stopWorking = () => {
+        const {chunkIndex, chunksToShow, course: {chunks}} = this.state;
+        if(chunkIndex + chunksToShow >= chunks.length) {
+            this.setState({
+                open: false,
+                startedWorking: false,
+                working: false,
+                chunkIndex: chunks.length
+            })
+        } else {
+            this.setState({
+                open: true,
+                working: false,
+                chunkIndex: chunksToShow + chunkIndex,
+            });
+        }
     };
 
     render() {
-        const {course, editModeArray, open, working, startedWorking, modalText, modalAction, modalButtonText} = this.state;
+        const {course, editModeArray, open, working, startedWorking, modalText, modalAction, modalButtonText, chunksToShow, chunkIndex} = this.state;
         const {authentication: {userInfo}} = this.props;
 
         return (
@@ -152,6 +163,7 @@ class SingleCoursePage extends Component {
                 {course.chunks.map((chunk, key)=> {
                     return <EditableCourseChunk
                         chunk={chunk}
+                        greyedOut={userInfo.isStudent && (key < chunkIndex || key >= chunkIndex+chunksToShow)}
                         setChunk={this.setChunk}
                         index={key}
                         key={key}
@@ -233,7 +245,7 @@ class SingleCoursePage extends Component {
                             {
                                 time: 0,
                                 callback: () => {
-                                    this.stop();
+                                    this.stopWorking();
                                     this.setState({
                                         modalButtonText: '',
                                         modalText: 'Enjoy your break!'
