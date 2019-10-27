@@ -30,7 +30,6 @@ function App({ authentication }) {
       <Container component="main" maxWidth="lg">
         <Route exact path="/" component={homeRoute} />
         <Route path="/login" component={LoginPage} />
-        <Route path="/profile" component={ProfilePage} />
         <Route path="/course/:code" component={props=><SingleCoursePage {...props} />} />
         <Route path="/createCourse" component={CreateCourse} />
         <PrivateRoute path="/profile" component={ProfilePage} />

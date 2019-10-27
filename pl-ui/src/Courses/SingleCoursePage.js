@@ -9,7 +9,7 @@ import {withAuthentication} from "../AuthContext";
 import Modal from '@material-ui/core/Modal';
 import Backdrop from "@material-ui/core/Backdrop/Backdrop";
 import {animated, useSpring} from "react-spring";
-
+import Timer from "react-compound-timer"
 
 const Fade = React.forwardRef(function Fade(props, ref) {
     const { in: open, children, onEnter, onExited, ...other } = props;
@@ -43,12 +43,18 @@ class SingleCoursePage extends Component {
             editModeArray: [],
             chunkIndex: 0,
             chunksToShow: 2,
-            open: false
+            open: false,
+            working: false,
+            startedWorking: false,
+            modalText: 'Start the course',
+            modalAction: this.startWorking,
+            modalButtonText: "BEGIN",
         }
     }
 
     componentDidMount() {
         const {match:{params: {code}}, history} = this.props;
+        const {authentication: {userInfo}} = this.props;
         Api.get(`courses/${code}`).then(resp=>{
             if(!resp) {
                 history.push('/courses');
@@ -56,6 +62,10 @@ class SingleCoursePage extends Component {
                 const {chunks} = resp;
                 resp.chunks = chunks.map(chunk => convertFromRaw(chunk));
                 this.setState({course: resp, editModeArray: resp.chunks.map(()=>false) })
+            }
+        }).then(()=>{
+            if(userInfo.isStudent) {
+                this.setModalOpen(true);
             }
         })
     }
@@ -106,8 +116,27 @@ class SingleCoursePage extends Component {
         });
     };
 
+    startWorking = () => {
+        const {startedWorking} = this.state;
+        const newState = {
+            open: false,
+            working: true
+        };
+        if(!startedWorking) {
+            newState.startedWorking = true
+        }
+        this.setState(newState);
+    };
+
+    stop = () => {
+        this.setState({
+            open: true,
+            working: false
+        });
+    };
+
     render() {
-        const {course, editModeArray, open} = this.state;
+        const {course, editModeArray, open, working, startedWorking, modalText, modalAction, modalButtonText} = this.state;
         const {authentication: {userInfo}} = this.props;
 
         return (
@@ -166,11 +195,92 @@ class SingleCoursePage extends Component {
                         BackdropProps={{
                             timeout: 500,
                         }}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
                     >
                         <Fade in={open}>
-
+                            <div style={{
+                                border: "2px solid #000",
+                                padding: "16px 32px 24px",
+                                boxShadow: "0px 3px 5px -1px rgba(0,0,0,0.2), 0px 5px 8px 0px rgba(0,0,0,0.14), 0px 1px 14px 0px rgba(0,0,0,0.12)",
+                                backgroundColor: "#fff",
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center"
+                            }}>
+                                <h3>{modalText}</h3>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={modalAction}
+                                >
+                                    {modalButtonText}
+                                </Button>
+                            </div>
                         </Fade>
                     </Modal>
+                )}
+                {userInfo.isStudent && working && (
+                    <Timer
+                        initialTime={15000}
+                        direction="backward"
+                        checkpoints={[
+                            {
+                                time: 0,
+                                callback: () => this.stop(),
+                            }
+                        ]}
+                    >
+                        {() => (
+                            <div
+                                style={{
+                                    position: "fixed",
+                                    top: "120px",
+                                    right: "20px",
+                                    borderRadius: "5px",
+                                    border: "2px solid #000",
+                                    padding: "10px",
+                                    fontSize: "30px",
+                                    boxShadow: "0px 3px 5px -1px rgba(0,0,0,0.2), 0px 5px 8px 0px rgba(0,0,0,0.14), 0px 1px 14px 0px rgba(0,0,0,0.12)",
+                                }}
+                            >
+                                <Timer.Minutes />:<Timer.Seconds />
+                            </div>
+                        )}
+                    </Timer>
+                )}
+                {userInfo.isStudent && startedWorking && !working && (
+                    <Timer
+                        initialTime={5000}
+                        direction="backward"
+                        checkpoints={[
+                            {
+                                time: 0,
+                                callback: () => this.startWorking(),
+                            }
+                        ]}
+                    >
+                        {() => (
+                            <div
+                                style={{
+                                    position: "fixed",
+                                    top: "120px",
+                                    right: "20px",
+                                    borderRadius: "5px",
+                                    border: "2px solid #000",
+                                    padding: "10px",
+                                    fontSize: "30px",
+                                    background: "white",
+                                    boxShadow: "0px 3px 5px -1px rgba(0,0,0,0.2), 0px 5px 8px 0px rgba(0,0,0,0.14), 0px 1px 14px 0px rgba(0,0,0,0.12)",
+                                }}
+                            >
+                                <Timer.Minutes />:<Timer.Seconds />
+                            </div>
+                        )}
+                    </Timer>
                 )}
             </div>
         );
