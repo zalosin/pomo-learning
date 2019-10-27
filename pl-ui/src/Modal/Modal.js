@@ -5,6 +5,7 @@ import Backdrop from '@material-ui/core/Backdrop';
 import { useSpring, animated } from 'react-spring';
 import './Modal.scss';
 import Button from '@material-ui/core/Button';
+import Api from '../Api';
 
 const useStyles = makeStyles(theme => ({
   modal: {
@@ -47,6 +48,19 @@ const Fade = React.forwardRef(function Fade(props, ref) {
 export default function SpringModal() {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
+  
+  let studyTime = 0;
+  let breakTime = 0;
+
+  function changeLearn(e){
+    studyTime = e.target.value;
+    console.log(studyTime)
+  }
+
+  function changeRest(e){
+    breakTime = e.target.value;
+    console.log(breakTime)
+  }
 
   const handleOpen = () => {
     setOpen(true);
@@ -56,10 +70,29 @@ export default function SpringModal() {
     setOpen(false);
   };
 
+
+  function sendValues(){
+    const userInfo = JSON.parse(localStorage.getItem('userInfo')).id;
+    console.log(userInfo);
+    const body = {
+      timeSettings : {
+        learnTime : studyTime,
+        breakTime : breakTime
+      }
+    }
+    console.log(`Sending -> ${JSON.stringify(body)}`);
+    Api.put(`profile/${userInfo}`,body).then(json => {
+        if (json.status) {
+        } else {
+            // alert(jsxon.message);
+        }
+    });
+  }
+
   return (
     <div>
       <Button variant="contained" className={classes.button} onClick={handleOpen}>
-        react-spring
+        Time settings
       </Button>
       <Modal
         aria-labelledby="spring-modal-title"
@@ -79,10 +112,10 @@ export default function SpringModal() {
             <p id="spring-modal-description">Allocate your time to learn but also to rest</p>
             <form>
             <label>Time of learning</label>
-            <input type='number' name='learn' placeholder='>20' min="20"></input><br/><br/>
+            <input type='number' name='learn' onChange={changeLearn} placeholder='>20' min="20"></input><br/><br/>
             <label>Resting time</label>
-            <input type='number' name='rest' placeholder='>0' min='0' max="20"></input><br/><br />
-            <input type="submit" value="Submit"></input><br/>
+            <input type='number' name='rest' onChange={changeRest} placeholder='>0' min='0' max="20"></input><br/><br />
+            <input type="submit" onClick={sendValues}  value="Submit"></input><br/>
             </form>
           </div>
         </Fade>

@@ -53,6 +53,35 @@ low(adapter)
                 badRequest(res);
             }
         });
+        app.put("/profile/:id", (req, res) => {
+            try {
+                console.log(
+                    `Received profile/username PUT request -> ${JSON.stringify(
+                        req.params.id
+                    )}`
+                );
+                console.log(`Received timeSettings -> ${JSON.stringify(req.body)}`)
+                const user =                 db
+                .get("profile")
+                .find({ id: parseInt(req.params.id) }).value()
+                console.log(`FOund this user -> ${JSON.stringify(user)}`);
+                db
+                    .get("profile")
+                    .find({ id: parseInt(req.params.id) })
+                    .assign({
+                        "learnTime": req.body.timeSettings.learnTime,
+                        "breakTime": req.body.timeSettings.breakTime
+                    })
+                    .write()
+                    .then((updated) => {
+                        console.log(JSON.stringify(updated));
+                        res.status(200).json(updated)
+                    })
+            } catch (e) {
+                console.error(e)
+                badRequest(res);
+            }
+        });
         app.post("/login", (req, res) => {
             try {
                 console.log(
