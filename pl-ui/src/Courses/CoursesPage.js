@@ -4,6 +4,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import { Link as RouterLink } from 'react-router-dom';
 
 import Api from '../Api';
@@ -36,6 +37,9 @@ class CoursesPage extends Component {
                     {courses.map(course => (
                         <RouterLink to={`/course/${course.id}`}>
                             <ListItem divider>
+                                <ListItemIcon style={{ color: 'green' }}>
+                                    {course.readTime.text.slice(0, -4)}
+                                </ListItemIcon>
                                 <ListItemText
                                     primary={course.title}
                                     secondary={course.description}
